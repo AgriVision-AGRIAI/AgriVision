@@ -1,7 +1,11 @@
 import 'package:agrivision/themes/utils/colors.theme.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+import '../../services/auth.services.dart';
 import '../../themes/utils/spacing.theme.dart';
 import '../../themes/utils/typography.theme.dart';
+import '../../utils/app-localization.utils.dart';
+import '../../utils/language.utils.dart';
 import '../../widgets/responsive-base.widget.dart';
 import 'otp-verify.pages.dart';
 
@@ -13,36 +17,92 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String _selectedLanguage = 'English';
+  // ── controllers & state ───────────────────────────────
+  final TextEditingController _phoneController = TextEditingController();
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
 
-  final Map<String, String> _languages = {
-    'English': 'English',
-    'Hindi': 'हिन्दी',
-    'Telugu': 'తెలుగు',
-    'Tamil': 'தமிழ்',
-  };
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
 
   void _showLanguagePicker(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    );
     showCupertinoModalPopup(
       context: context,
       builder: (_) => CupertinoActionSheet(
-        title: const Text('Select Language'),
-        actions: _languages.entries.map((entry) {
+        title: Text(AppLocalizations.of(context)!.translate("Select Language")),
+        actions: LanguageProvider.supportedLanguages.map((lang) {
           return CupertinoActionSheetAction(
             onPressed: () {
-              setState(() {
-                _selectedLanguage = entry.value;
-              });
+              languageProvider.changeLanguage(lang['locale']);
               Navigator.pop(context);
             },
-            child: Text(entry.value),
+            child: Text(lang['name']),
           );
         }).toList(),
         cancelButton: CupertinoActionSheetAction(
           onPressed: () => Navigator.pop(context),
           isDefaultAction: true,
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context)!.translate("Cancel")),
         ),
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────
+  // GET OTP  →  calls login service then navigates
+  // ─────────────────────────────────────────────────────
+  Future<void> _handleGetOtp() async {
+    final phone = _phoneController.text.trim();
+
+    // ── basic validation ──
+    if (phone.isEmpty || phone.length != 10) {
+      _showError(AppLocalizations.of(context)!.translate("Please enter a valid 10-digit mobile number."));
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final result = await _authService.login(phone);
+
+      if (!mounted) return;
+
+      if (result['success'] == true) {
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (_) => OTPVerificationScreen(phonenumber: phone),
+          ),
+        );
+      } else {
+        _showError(result['message'] ?? AppLocalizations.of(context)!.translate("Failed to send OTP."));
+      }
+    } catch (e) {
+      _showError(AppLocalizations.of(context)!.translate("Something went wrong. Please try again."));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  // ── error dialog helper ───────────────────────────────
+  void _showError(String message) {
+    showCupertinoDialog(
+      context: context,
+      builder: (_) => CupertinoAlertDialog(
+        title: Text(AppLocalizations.of(context)!.translate("ERROR")),
+        content: Text(message),
+        actions: [
+          CupertinoDialogAction(
+            child: Text(AppLocalizations.of(context)!.translate("OK")),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
       ),
     );
   }
@@ -50,6 +110,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = CupertinoTheme.of(context);
+
+    // ── read current language name from provider ──
+    final languageProvider = context.watch<LanguageProvider>();
+    final currentLangName =
+        LanguageProvider.supportedLanguages.firstWhere(
+              (l) => l['locale'] == languageProvider.selectedLocale,
+              orElse: () => LanguageProvider.supportedLanguages.first,
+            )['name']
+            as String;
 
     return CupertinoPageScaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -71,10 +140,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
-                      children: const [
-                        Icon(CupertinoIcons.leaf_arrow_circlepath),
-                        SizedBox(width: 6),
-                        Text('AgriVision', style: AppTextStyles.h2),
+                      children: [
+                        ClipOval(
+                          child: Image.asset(
+                            'assets/images/logo-transparent.png',
+                            height: 50,
+                            width: 50,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(AppLocalizations.of(context)!.translate("AgriVision"), style: AppTextStyles.h2),
                       ],
                     ),
                     GestureDetector(
@@ -92,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             const Icon(CupertinoIcons.globe, size: 14),
                             const SizedBox(width: 6),
-                            Text(_selectedLanguage),
+                            Text(currentLangName),
                             const SizedBox(width: 4),
                             const Icon(CupertinoIcons.chevron_down, size: 14),
                           ],
@@ -128,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 /// 🧠 Heading
                 Text(
-                  'Welcome to\nAgriVision',
+                  AppLocalizations.of(context)!.translate("Welcome to\nAgriVision"),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.h1.copyWith(
                     color: CupertinoColors.black,
@@ -138,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: AppSpacing.sm),
 
                 Text(
-                  'Enter your mobile number to get started.',
+                  AppLocalizations.of(context)!.translate("Enter your mobile number to get started."),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.body.copyWith(
                     color: CupertinoColors.systemGrey,
@@ -158,7 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'MOBILE NUMBER',
+                        AppLocalizations.of(context)!.translate("MOBILE NUMBER"),
                         style: AppTextStyles.caption.copyWith(
                           letterSpacing: 1.1,
                           color: CupertinoColors.systemGrey,
@@ -192,10 +268,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: CupertinoTextField(
+                                controller: _phoneController,
                                 placeholder: '9876543210',
                                 keyboardType: TextInputType.phone,
                                 decoration: null,
                                 padding: EdgeInsets.zero,
+                                maxLength: 10,
                               ),
                             ),
                             Icon(
@@ -216,37 +294,35 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: theme.primaryColor,
                           borderRadius: BorderRadius.circular(16),
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              CupertinoPageRoute(
-                                builder: (_) => const OTPVerificationScreen(),
-                              ),
-                            );
-                          },
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                children: [
-                                  Center(
-                                    child: Text(
-                                      'Get OTP',
-                                      style: AppTextStyles.buttonStyles,
+                          onPressed: _isLoading ? null : _handleGetOtp,
+                          child: _isLoading
+                              ? const CupertinoActivityIndicator(
+                                  color: CupertinoColors.white,
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Center(
+                                          child: Text(
+                                            AppLocalizations.of(context)!.translate("Get OTP"),
+                                            style: AppTextStyles.buttonStyles,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 14),
+                                        const Icon(
+                                          CupertinoIcons
+                                              .arrowshape_turn_up_right_fill,
+                                          color: AppThemeColors.textButton,
+                                          size: 22,
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  SizedBox(width: 14),
-                                  Icon(
-                                    CupertinoIcons
-                                        .arrowshape_turn_up_right_fill,
-                                    color: AppThemeColors.textButton,
-                                    size: 22,
-                                  ),
-                                ],
-                              ),
-                              SizedBox(width: 8),
-                              Icon(CupertinoIcons.arrow_right, size: 18),
-                            ],
-                          ),
+                                    const SizedBox(width: 8),
+                                    const Icon(CupertinoIcons.arrow_right, size: 18),
+                                  ],
+                                ),
                         ),
                       ),
                     ],
@@ -259,7 +335,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 /// 📜 Footer
                 Text(
-                  'By continuing, you agree to our\nTerms of Service & Privacy Policy',
+                  AppLocalizations.of(context)!.translate("By continuing, you agree to our\nTerms of Service & Privacy Policy"),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.caption.copyWith(
                     color: CupertinoColors.systemGrey,

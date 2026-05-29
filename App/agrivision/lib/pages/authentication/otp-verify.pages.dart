@@ -3,12 +3,14 @@ import 'package:agrivision/pages/tab-shell.pages.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Material, Colors;
 import 'package:pinput/pinput.dart';
-
+import '../../services/auth.services.dart';
 import '../../themes/utils/typography.theme.dart';
+import '../../utils/app-localization.utils.dart';
 import '../../widgets/responsive-base.widget.dart';
 
 class OTPVerificationScreen extends StatefulWidget {
-  const OTPVerificationScreen({super.key});
+  final String phonenumber;
+  const OTPVerificationScreen({super.key, required this.phonenumber});
 
   @override
   State<OTPVerificationScreen> createState() => _OTPVerificationScreenState();
@@ -19,6 +21,9 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
 
   final TextEditingController _otpController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  final AuthService _authService = AuthService();
+  bool _isVerifying = false;
+  bool _isResending = false;
 
   int _secondsRemaining = 59;
   Timer? _timer;
@@ -44,6 +49,80 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
         setState(() => _secondsRemaining--);
       }
     });
+  }
+
+  // ─────────────────────────────────────────────────────
+  // VERIFY OTP  →  calls verify service then navigates
+  // ─────────────────────────────────────────────────────
+  Future<void> _handleVerify() async {
+    setState(() => _isVerifying = true);
+
+    try {
+      final result = await _authService.verify(
+        widget.phonenumber,
+        _otpController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      if (result['success'] == true) {
+        Navigator.of(context).pushReplacement(
+          CupertinoPageRoute(
+            builder: (_) => MainTabShell(),
+          ),
+        );
+      } else {
+        _showError(result['message'] ?? AppLocalizations.of(context)!.translate("Invalid OTP. Please try again."));
+      }
+    } catch (e) {
+      _showError(AppLocalizations.of(context)!.translate("Something went wrong. Please try again."));
+    } finally {
+      if (mounted) setState(() => _isVerifying = false);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────
+  // RESEND OTP  →  calls resendOtp service & restarts timer
+  // ─────────────────────────────────────────────────────
+  Future<void> _handleResend() async {
+    if (_secondsRemaining > 0 || _isResending) return;
+
+    setState(() => _isResending = true);
+
+    try {
+      final result = await _authService.resendOtp(widget.phonenumber);
+
+      if (!mounted) return;
+
+      if (result['success'] == true) {
+        _startTimer();                          // restart countdown
+        _otpController.clear();                 // clear previous OTP input
+        setState(() {});
+      } else {
+        _showError(result['message'] ?? AppLocalizations.of(context)!.translate("Failed to resend OTP."));
+      }
+    } catch (e) {
+      _showError(AppLocalizations.of(context)!.translate("Something went wrong. Please try again."));
+    } finally {
+      if (mounted) setState(() => _isResending = false);
+    }
+  }
+
+  // ── error dialog helper ───────────────────────────────
+  void _showError(String message) {
+    showCupertinoDialog(
+      context: context,
+      builder: (_) => CupertinoAlertDialog(
+        title: Text(AppLocalizations.of(context)!.translate("ERROR")),
+        content: Text(message),
+        actions: [
+          CupertinoDialogAction(
+            child: Text(AppLocalizations.of(context)!.translate("OK")),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -110,10 +189,9 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                     ),
                     Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(CupertinoIcons.leaf_arrow_circlepath),
-                        SizedBox(width: 6),
-                        Text('KRUSHIMITRA', style: AppTextStyles.h2),
+                      children: [
+                        const SizedBox(width: 6),
+                        Text(AppLocalizations.of(context)!.translate("OTP Verification"), style: AppTextStyles.h2),
                       ],
                     ),
                   ],
@@ -125,18 +203,23 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       /// 🧠 TITLE
-                      const Text(
-                        'Verify Your Identity',
+                      Text(
+                        AppLocalizations.of(context)!.translate("Verify Your Identity"),
                         style: AppTextStyles.h1,
                         textAlign: TextAlign.center,
                       ),
         
                       const SizedBox(height: 12),
         
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 32),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
                         child: Text(
-                          "We've sent a 5-digit verification code to +91 ••••••482. Please enter it below to proceed.",
+                          AppLocalizations.of(context)!.translate(
+                            "otp_message",
+                            params: {
+                              "phone": "+91 ${widget.phonenumber}",
+                            }
+                          ),
                           textAlign: TextAlign.center,
                           style: AppTextStyles.body,
                         ),
@@ -174,17 +257,38 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                         ),
                         child: Text(
                           _secondsRemaining > 0
-                              ? 'RESEND IN 00:${_secondsRemaining.toString().padLeft(2, '0')}'
+                              ? AppLocalizations.of(context)!.translate("RESEND IN ")+"00:${_secondsRemaining.toString().padLeft(2, '0')}"
                               : '',
                           style: AppTextStyles.caption,
                         ),
                       ),
         
                       const SizedBox(height: 12),
-        
-                      const Text(
-                        "Didn't receive the code? Resend Code",
-                        style: AppTextStyles.caption,
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(AppLocalizations.of(context)!.translate("Didn't receive the code? "), style: AppTextStyles.caption.copyWith(
+                                  color: _secondsRemaining > 0
+                                      ? CupertinoColors.systemGrey
+                                      : theme.primaryColor,
+                                ),),
+                      GestureDetector(
+                        onTap: _handleResend,
+                        child: _isResending
+                            ? CupertinoActivityIndicator(
+                                color: theme.primaryColor,
+                              )
+                            : Text(
+                        AppLocalizations.of(context)!.translate("Resend Code"),
+                        style: AppTextStyles.caption.copyWith(
+                                  color: _secondsRemaining > 0
+                                      ? CupertinoColors.systemGrey
+                                      : theme.primaryColor,
+                                ),
+                              ),
+                      ),
+                        ],
                       ),
                     ],
                   ),
@@ -200,24 +304,22 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                     padding: const EdgeInsets.symmetric(
                         vertical: 18, horizontal: 24),
                     onPressed: _otpController.text.length ==
-                            _otpLength
-                        ? () {
-                            Navigator.of(context).pushReplacement(
-                              CupertinoPageRoute(
-                                builder: (_) => MainTabShell(),
-                              ),
-                            );
-                          }
+                            _otpLength && !_isVerifying
+                        ? _handleVerify
                         : null,
-                    child: const Row(
+                    child:  _isVerifying
+                        ? const CupertinoActivityIndicator(
+                            color: CupertinoColors.white,
+                          )
+                        : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Verify & Proceed',
+                          AppLocalizations.of(context)!.translate("Verify & Proceed"),
                           style: AppTextStyles.buttonStyles,
                         ),
-                        SizedBox(width: 8),
-                        Icon(CupertinoIcons.arrow_right),
+                        const SizedBox(width: 8),
+                        const Icon(CupertinoIcons.arrow_right),
                       ],
                     ),
                   ),

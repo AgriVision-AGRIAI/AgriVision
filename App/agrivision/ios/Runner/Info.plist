@@ -54,5 +54,9 @@
 	<string>This app needs photo access to select crop images.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>This app needs permission to save scanned images.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs location access to fetch weather data.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs location access to fetch weather data.</string>
 </dict>
 </plist>

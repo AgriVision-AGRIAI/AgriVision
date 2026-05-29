@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import '../../../themes/utils/colors.theme.dart';
 import '../../../themes/utils/spacing.theme.dart';
+import '../../../utils/app-localization.utils.dart';
 
 class ScanResultCard extends StatelessWidget {
-  const ScanResultCard({super.key});
+  final File image;
+  const ScanResultCard({super.key, required this.image});
 
   @override
   Widget build(BuildContext context) {
@@ -11,9 +15,9 @@ class ScanResultCard extends StatelessWidget {
       height: 220,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        image: const DecorationImage(
-          image: AssetImage('assets/images/farmer.png'),
-          fit: BoxFit.cover,
+        image: DecorationImage(
+          image: FileImage(image),
+          fit: BoxFit.fill,
         ),
       ),
       child: Container(
@@ -41,9 +45,9 @@ class ScanResultCard extends StatelessWidget {
                   color: AppThemeColors.success,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text(
-                  '87% MATCH',
-                  style: TextStyle(
+                child: Text(
+                  AppLocalizations.of(context)!.translate("87% MATCH"),
+                  style: const TextStyle(
                     color: CupertinoColors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -52,9 +56,9 @@ class ScanResultCard extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            const Text(
-              'Scan Successful',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.translate("Scan Successful"),
+              style: const TextStyle(
                 color: CupertinoColors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.w700,

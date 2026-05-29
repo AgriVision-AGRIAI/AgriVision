@@ -3,9 +3,15 @@ import '../../../themes/utils/colors.theme.dart';
 import '../../../themes/utils/spacing.theme.dart';
 import '../../../themes/utils/typography.theme.dart';
 
-class DiseaseDetectedCard extends StatelessWidget {
-  const DiseaseDetectedCard({super.key});
+class DiseaseDetectedCard extends StatefulWidget {
+  final String name;
+  const DiseaseDetectedCard({super.key, required this.name});
 
+  @override
+  State<DiseaseDetectedCard> createState() => _DiseaseDetectedCardState();
+}
+
+class _DiseaseDetectedCardState extends State<DiseaseDetectedCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,15 +32,10 @@ class DiseaseDetectedCard extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  'Late Blight Detected',
+                  widget.name,
                   style: AppTextStyles.h3,
-                ),
-                SizedBox(height: 6),
-                Text(
-                  'Commonly affects potato and tomato crops during wet seasons.',
-                  style: AppTextStyles.body,
                 ),
               ],
             ),

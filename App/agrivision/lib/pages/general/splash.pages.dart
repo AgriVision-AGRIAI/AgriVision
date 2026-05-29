@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import '../../utils/app-localization.utils.dart';
 import '../../widgets/responsive-base.widget.dart';
 import '../../themes/utils/spacing.theme.dart';
 import '../../themes/utils/typography.theme.dart';
 import '../authentication/signin.pages.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../tab-shell.pages.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -29,11 +32,15 @@ void initState() {
     _controller.forward();
   });
 
-  Timer(const Duration(seconds: 4), () {
+  Timer(const Duration(seconds: 4), () async {
     if (!mounted) return;
+    final storage = const FlutterSecureStorage();
+    final token = await storage.read(key: 'auth_token');
+    if (!mounted) return;
+
     Navigator.of(context).pushReplacement(
   PageRouteBuilder(
-    pageBuilder: (_, _, _) => const LoginScreen(),
+    pageBuilder: (_, _, _) => token != null ? const MainTabShell() : const LoginScreen(),
     transitionDuration: Duration.zero,
     reverseTransitionDuration: Duration.zero,
   ),
@@ -70,16 +77,19 @@ Widget build(BuildContext context) {
             ),
             child: Center(
               child: Container(
-                width: 70,
-                height: 70,
+                width: 80,
+                height: 80,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: theme.primaryColor,
+                  color: theme.scaffoldBackgroundColor,
                 ),
-                child: const Icon(
-                  CupertinoIcons.leaf_arrow_circlepath,
-                  color: CupertinoColors.white,
-                  size: 36,
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/logo-transparent.png',
+                    height: 20,
+                    width: 20,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
@@ -88,7 +98,7 @@ Widget build(BuildContext context) {
           const SizedBox(height: AppSpacing.xl),
       
           Text(
-            'KrushiMitra',
+            AppLocalizations.of(context)!.translate("AgriVision"),
             style: AppTextStyles.h1.copyWith(
               color: theme.primaryColor,
             ),
@@ -97,19 +107,19 @@ Widget build(BuildContext context) {
           const SizedBox(height: AppSpacing.sm),
       
           Text(
-            'Smart Farming Made Simple',
+            AppLocalizations.of(context)!.translate("Smart Farming Made Simple"),
             style: AppTextStyles.body.copyWith(
-              color: theme.primaryColor.withOpacity(0.7),
+              color: theme.primaryColor.withOpacity(0.9),
             ),
           ),
       
           const Spacer(flex: 3),
       
           Text(
-            'PREPARING YOUR FIELD',
+            AppLocalizations.of(context)!.translate("PREPARING YOUR FIELD"),
             style: AppTextStyles.caption.copyWith(
               letterSpacing: 1.2,
-              color: theme.primaryColor.withOpacity(0.6),
+              color: theme.primaryColor.withOpacity(0.9),
             ),
           ),
       
@@ -145,18 +155,18 @@ Widget build(BuildContext context) {
           const SizedBox(height: AppSpacing.lg),
       
           Text(
-            '✦ Powered by AI Intelligence',
+            AppLocalizations.of(context)!.translate("✦ Powered by AI Intelligence"),
             style: AppTextStyles.caption.copyWith(
-              color: theme.primaryColor.withOpacity(0.5),
+              color: theme.primaryColor.withOpacity(0.9),
             ),
           ),
       
           const SizedBox(height: AppSpacing.sm),
       
           Text(
-            'v2.4.0 • Farmer’s Friend',
+            AppLocalizations.of(context)!.translate("Farmer’s Friend"),
             style: AppTextStyles.caption.copyWith(
-              color: theme.primaryColor.withOpacity(0.4),
+              color: theme.primaryColor.withOpacity(0.9),
             ),
           ),
       

@@ -65,8 +65,8 @@ class HomeBottomNav extends StatelessWidget {
                 const SizedBox(width: 72),
       
                 _NavItem(
-                  icon: CupertinoIcons.chat_bubble_text,
-                  label: 'Expert',
+                  icon: CupertinoIcons.person_alt,
+                  label: 'Profile',
                   active: currentIndex == 2,
                   onTap: () => onTabChanged(2),
                 ),

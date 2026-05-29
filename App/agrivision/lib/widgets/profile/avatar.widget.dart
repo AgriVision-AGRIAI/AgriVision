@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../themes/utils/colors.theme.dart';
 import '../../themes/utils/spacing.theme.dart';
 import '../../themes/utils/typography.theme.dart';
+import '../../utils/app-localization.utils.dart';
 
 class ProfileAvatar extends StatelessWidget {
   const ProfileAvatar({super.key});
@@ -37,13 +38,13 @@ class ProfileAvatar extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.md),
-        const Text(
-          'Ramesh Kumar',
+        Text(
+          AppLocalizations.of(context)!.translate("Farmer"),
           style: AppTextStyles.h2,
         ),
         const SizedBox(height: 4),
-        const Text(
-          'Verified Farmer • Oct 2023',
+        Text(
+          AppLocalizations.of(context)!.translate("Verified • AgriVision"),
           style: AppTextStyles.caption,
         ),
       ],

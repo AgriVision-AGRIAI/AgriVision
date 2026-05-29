@@ -1,0 +1,16 @@
+#!/bin/zsh
+
+# Save current JAVA_HOME
+OLD_JAVA=$JAVA_HOME
+
+# Switch to Java 17 ONLY for this script
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+
+echo "Using Java 17 for Flutter build..."
+
+flutter "$@"
+
+# Restore original Java (25 or system default)
+export JAVA_HOME=$OLD_JAVA
+
+echo "Restored original Java"

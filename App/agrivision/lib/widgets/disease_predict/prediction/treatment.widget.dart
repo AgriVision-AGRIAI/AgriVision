@@ -2,16 +2,23 @@ import 'package:flutter/cupertino.dart';
 import '../../../themes/utils/colors.theme.dart';
 import '../../../themes/utils/spacing.theme.dart';
 import '../../../themes/utils/typography.theme.dart';
+import '../../../utils/app-localization.utils.dart';
 
-class TreatmentPlanCard extends StatelessWidget {
-  const TreatmentPlanCard({super.key});
+class TreatmentPlanCard extends StatefulWidget {
+  final Map<String, dynamic> data;
+  const TreatmentPlanCard({super.key, required this.data});
 
+  @override
+  State<TreatmentPlanCard> createState() => _TreatmentPlanCardState();
+}
+
+class _TreatmentPlanCardState extends State<TreatmentPlanCard> {
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Treatment Plan', style: AppTextStyles.h3),
+        Text(AppLocalizations.of(context)!.translate("Treatment Plan"), style: AppTextStyles.h3),
         const SizedBox(height: AppSpacing.md),
 
         Container(
@@ -24,12 +31,12 @@ class TreatmentPlanCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                children: const [
-                  Icon(CupertinoIcons.drop, color: AppThemeColors.success),
-                  SizedBox(width: 8),
+                children: [
+                  const Icon(CupertinoIcons.drop, color: AppThemeColors.success),
+                  const SizedBox(width: 8),
                   Text(
-                    'RECOMMENDED SPRAY',
-                    style: TextStyle(
+                    AppLocalizations.of(context)!.translate("RECOMMENDED SPRAY"),
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: AppThemeColors.success,
@@ -38,8 +45,8 @@ class TreatmentPlanCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),
-              const Text(
-                'Copper Fungicide XL',
+              Text(
+                widget.data['spray_name']?.toString() ?? 'N/A',
                 style: AppTextStyles.h3,
               ),
 
@@ -47,16 +54,18 @@ class TreatmentPlanCard extends StatelessWidget {
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   _InfoItem(
                     icon: CupertinoIcons.drop_fill,
-                    title: 'DOSAGE',
-                    value: '2ml / 1L water',
+                    title: AppLocalizations.of(context)!.translate("DOSAGE"),
+                    value: widget.data['dosage']?.toString() ?? 'N/A'
                   ),
                   _InfoItem(
                     icon: CupertinoIcons.calendar,
-                    title: 'FREQUENCY',
-                    value: 'Every 7 Days',
+                    title: AppLocalizations.of(context)!.translate("FREQUENCY"),
+                    value: widget.data['frequency'] != null ? AppLocalizations.of(context)!.translate("frequency_table", params: {
+                      "frequency": widget.data['frequency']
+                    } ): 'N/A'
                   ),
                 ],
               ),

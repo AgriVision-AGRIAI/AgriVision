@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:agrivision/pages/disease_predict/prediction.pages.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../themes/utils/colors.theme.dart';
 import '../../themes/utils/spacing.theme.dart';
 import '../../themes/utils/typography.theme.dart';
+import '../../utils/app-localization.utils.dart';
 import '../../widgets/disease_predict/scanner/circleicon.widget.dart';
 import '../../widgets/disease_predict/scanner/pill.widget.dart';
 import '../../widgets/disease_predict/scanner/scanframe.widget.dart';
@@ -58,16 +61,17 @@ class _CropScannerScreenState extends State<CropScannerScreen> {
   /// 🖼 PICK IMAGE FROM GALLERY
   Future<void> _pickFromGallery() async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
+    final file = await picker.pickImage(source: ImageSource.gallery);
 
-    if (image != null) {
+    if (file != null) {
       // TODO: Send image.path to ML model
-      debugPrint('Picked image: ${image.path}');
+      debugPrint('Picked image: ${file.path}');
+      File image = File(file.path);
 
       /// 👉 Navigate to Analysis Result screen
       Navigator.push(
         context,
-        CupertinoPageRoute(builder: (_) => const PredictionScreen()),
+        CupertinoPageRoute(builder: (_) => PredictionScreen(image: image)),
       );
     }
   }
@@ -77,16 +81,17 @@ class _CropScannerScreenState extends State<CropScannerScreen> {
     if (_controller == null || !_controller!.value.isInitialized) return;
 
     try {
-      final image = await _controller!.takePicture();
+      final file = await _controller!.takePicture();
 
-      debugPrint('Captured image: ${image.path}');
+      debugPrint('Captured image: ${file.path}');
+      File? image = File(file.path);
 
       if (!mounted) return;
 
       /// 👉 Navigate to Analysis Result screen
       Navigator.push(
         context,
-        CupertinoPageRoute(builder: (_) => const PredictionScreen()),
+        CupertinoPageRoute(builder: (_) => PredictionScreen(image: image)),
       );
     } catch (e) {
       debugPrint('Error capturing image: $e');
@@ -139,9 +144,9 @@ class _CropScannerScreenState extends State<CropScannerScreen> {
                     icon: CupertinoIcons.xmark,
                     onTap: () => Navigator.pop(context),
                   ),
-                  const Pill(
+                  Pill(
                     icon: CupertinoIcons.leaf_arrow_circlepath,
-                    label: 'CROP SCANNER',
+                    label: AppLocalizations.of(context)!.translate("CROP SCANNER"),
                   ),
                   Icon(
                     CupertinoIcons.question,
@@ -158,12 +163,12 @@ class _CropScannerScreenState extends State<CropScannerScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Pill(label: 'Align leaf within the frame'),
+                Pill(label: AppLocalizations.of(context)!.translate("Align leaf within the frame")),
                 SizedBox(height: AppSpacing.xl),
                 ScanFrame(),
                 SizedBox(height: AppSpacing.lg),
                 Text(
-                  'Keep the camera steady for a better scan',
+                  AppLocalizations.of(context)!.translate("Keep the camera steady for a better scan"),
                   style: AppTextStyles.caption,
                 ),
               ],

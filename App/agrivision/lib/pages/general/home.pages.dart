@@ -1,6 +1,7 @@
-import 'package:agrivision/pages/authentication/otp-verify.pages.dart';
-import 'package:agrivision/pages/general/splash.pages.dart';
-import 'package:agrivision/pages/weather/weather.pages.dart';
+import '../../utils/app-localization.utils.dart';
+import '../recommendation/crop.pages.dart';
+import '../recommendation/fertilizer.pages.dart';
+import '../weather/weather.pages.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../themes/utils/typography.theme.dart';
@@ -50,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Namaste, Ramesh 🤚🏼',
+                              AppLocalizations.of(context)!.translate("Hi, Farmer 🤚🏼"),
                               style: AppTextStyles.title,
                             ),
                           ),
@@ -97,8 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Explore Services',
+                          Text(
+                            AppLocalizations.of(context)!.translate("Explore Services"),
                             style: AppTextStyles.h2,
                           ),
                           const SizedBox(height: AppSpacing.md),
@@ -108,38 +109,38 @@ class _HomeScreenState extends State<HomeScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
-                            children: const [
+                            children: [
                               HomeServiceCard(
-                                title: 'Crop Advice',
-                                subtitle: 'Best for your soil',
+                                title: AppLocalizations.of(context)!.translate("Crop Advice"),
+                                subtitle: AppLocalizations.of(context)!.translate("Best for your soil"),
                                 icon: CupertinoIcons.crop,
                                 bgColor: AppThemeColors.cropbackground,
                                 iconColor: AppThemeColors.cropicon,
-                                destination: SplashScreen(),
+                                destination: CropRecommendPage(),
                               ),
                               HomeServiceCard(
-                                title: 'Weather',
-                                subtitle: '7-day forecast',
+                                title: AppLocalizations.of(context)!.translate("Weather"),
+                                subtitle: AppLocalizations.of(context)!.translate("7-day forecast"),
                                 icon: CupertinoIcons.cloud_sun,
                                 bgColor: AppThemeColors.weatherbackground,
                                 iconColor: AppThemeColors.weathericon,
                                 destination: WeatherScreen(),
                               ),
                               HomeServiceCard(
-                                title: 'Fertilizers',
-                                subtitle: 'Nutrient schedules',
+                                title: AppLocalizations.of(context)!.translate("Fertilizers"),
+                                subtitle: AppLocalizations.of(context)!.translate("Nutrient schedules"),
                                 icon: CupertinoIcons.lab_flask_solid,
                                 bgColor: AppThemeColors.fertilizersbackground,
                                 iconColor: AppThemeColors.fertilizersicon,
-                                destination: OTPVerificationScreen(),
+                                destination: FertilizerRecommendPage(),
                               ),
                               HomeServiceCard(
-                                title: 'Market Rates',
-                                subtitle: 'Live Mandi prices',
+                                title: AppLocalizations.of(context)!.translate("Market Rates"),
+                                subtitle: AppLocalizations.of(context)!.translate("Live Mandi prices"),
                                 icon: CupertinoIcons.money_dollar,
                                 bgColor: AppThemeColors.marketbackground,
                                 iconColor: AppThemeColors.marketicon,
-                                destination: HomeScreen(),
+                                destination: SizedBox(),
                               ),
                             ],
                           ),
@@ -152,14 +153,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-
-            // /// 🔽 FLOATING BOTTOM NAV BAR
-            // const Positioned(
-            //   left: 0,
-            //   right: 0,
-            //   bottom: 0,
-            //   child: HomeBottomNav(),
-            // ),
           ],
         ),
       ),

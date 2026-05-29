@@ -1,23 +1,31 @@
+import 'package:agrivision/utils/crop-prediction.utils.dart';
 import 'package:flutter/cupertino.dart';
 import '../../../themes/utils/colors.theme.dart';
 import '../../../themes/utils/spacing.theme.dart';
 import '../../../themes/utils/typography.theme.dart';
+import '../../../utils/app-localization.utils.dart';
 
-class SymptomsList extends StatelessWidget {
-  const SymptomsList({super.key});
+class SymptomsList extends StatefulWidget {
+  final List<CropSymptoms> data;
+  const SymptomsList({super.key, required this.data});
 
+  @override
+  State<SymptomsList> createState() => _SymptomsListState();
+}
+
+class _SymptomsListState extends State<SymptomsList> {
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          children: const [
-            Text('Key Symptoms', style: AppTextStyles.h3),
-            Spacer(),
+          children: [
+            Text(AppLocalizations.of(context)!.translate("Key Symptoms"), style: AppTextStyles.h3),
+            const Spacer(),
             Text(
-              'FIELD GUIDE',
-              style: TextStyle(
+              AppLocalizations.of(context)!.translate("FIELD GUIDE"),
+              style: const TextStyle(
                 fontSize: 12,
                 color: AppThemeColors.success,
                 fontWeight: FontWeight.w600,
@@ -27,17 +35,15 @@ class SymptomsList extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
 
-        _symptomItem(
-          icon: CupertinoIcons.circle_grid_hex,
-          title: 'Brown Spots',
-          description: 'Circular dark spots with yellow halos',
-        ),
-
-        _symptomItem(
-          icon: CupertinoIcons.cloud_rain,
-          title: 'White Mold',
-          description: 'Fuzzy growth on the leaf underside',
-        ),
+        ...widget.data.asMap().entries.map((entry) {
+          final int index = entry.key;
+          final symptom = entry.value;
+          return _symptomItem(
+            icon: symptomIcons[index % symptomIcons.length],
+            title: symptom.title,
+            description: symptom.description,
+          );
+        }).toList(),
       ],
     );
   }
