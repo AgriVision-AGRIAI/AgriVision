@@ -52,7 +52,7 @@ lib/
 
 ## Features & UX Highlights
 
-### 1. Multi-Lingual Capability
+### Multi-Lingual Capability
 To eliminate communication barriers in farming sectors, the application utilizes a tailored localization mechanism. Supported languages (like English, Hindi, and regional dialects) are stored as JSON files under `assets/languages/` and dynamically compiled at runtime via `AppLocalizations`.
 
 ### Crop Pathology Scanner
