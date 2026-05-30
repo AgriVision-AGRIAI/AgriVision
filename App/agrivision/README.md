@@ -1,16 +1,89 @@
-# agrivision
+# AgriVision Mobile Client (`App/agrivision`)
 
-A new Flutter project.
+<p align="center">
+  <img src="assets/images/logo-transparent.png" width="150" alt="AgriVision App Logo"/>
+</p>
 
-## Getting Started
+A cross-platform mobile client designed for real-time field utilization by farmers and agricultural researchers. Built on **Flutter**, the application features location-aware weather telemetry, camera-based leaf disease detection, and customized soil recommendations.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## Technology Stack
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+*   **Framework**: [Flutter SDK](https://flutter.dev/) (Dart)
+*   **State Management**: Provider (MultiProvider architecture)
+*   **Design System**: Custom Material & Cupertino adaptive layouts
+*   **Localization**: custom Multi-lingual asset localization engine
+*   **API Client**: HTTP networking with backend services
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## Directory Layout
+
+```
+lib/
+├── main.dart            # Entrypoint, initializing Providers and locales
+├── pages/               # Feature-based view screens
+│   ├── authentication/  # Sign-up, sign-in, and account registration pages
+│   ├── disease_predict/ # Camera/gallery plant leaf scanner page
+│   ├── general/         # Splash screens, landing dashboard, settings
+│   ├── recommendation/  # Soil detail input forms & crop suggestions
+│   └── weather/         # Temperature & multi-day forecasts layout
+├── services/            # API client layers and HTTP endpoints
+├── themes/              # Custom design themes and dynamic ThemeProviders
+│   ├── light.theme.dart # Light-mode typography & palettes
+│   ├── dark.theme.dart  # Dark-mode color mappings
+│   └── provider.theme.dart # Dynamic runtime switching provider
+├── utils/               # App localization & asset mapping utilities
+└── widgets/             # Reusable custom UI components (Buttons, Inputs)
+```
+
+---
+
+## Features & UX Highlights
+
+### 1. Multi-Lingual Capability
+To eliminate communication barriers in farming sectors, the application utilizes a tailored localization mechanism. Supported languages (like English, Hindi, and regional dialects) are stored as JSON files under `assets/languages/` and dynamically compiled at runtime via `AppLocalizations`.
+
+### Dynamic Aesthetic Themes
+A custom `ThemeProvider` monitors environment states and adjusts color tones across light and dark displays. 
+*   **Light Theme**: Fresh green palettes expressing organic growth.
+*   **Dark Theme**: Deep ocean green layouts for low-light night conditions in rural landscapes.
+
+### Crop Pathology Scanner
+Leveraging device cameras, users capture leaf abnormalities. The application transmits binary payloads to the node server which processes diagnostics through computer vision, returning:
+*   Identified disease label
+*   Severity indicators
+*   Immediate farming countermeasures & biological treatments
+
+---
+
+## Mobile Compilation & Setup
+
+### Prerequisites
+*   Ensure Flutter is installed (`flutter doctor` should report no errors).
+*   Connect an Android emulator, iOS simulator, or a debug-configured mobile device.
+
+### Installation Steps
+
+1.  Navigate to the directory:
+    ```bash
+    cd App/agrivision
+    ```
+
+2.  Fetch package dependencies listed in `pubspec.yaml`:
+    ```bash
+    flutter pub get
+    ```
+
+3.  Configure API base URL:
+    *   Open `lib/services/api.service.dart` (or your endpoint helper) and update the base host address to target your running Backend API server.
+
+4.  Compile and execute the app:
+    ```bash
+    # Run on active device
+    flutter run
+    
+    # Release build for Android
+    flutter build apk --release
+    ```
