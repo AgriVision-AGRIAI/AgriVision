@@ -81,10 +81,7 @@ Leveraging device cameras, users capture leaf abnormalities. The application tra
     flutter pub get
     ```
 
-3.  Configure API base URL:
-    *   Open `lib/services/api.service.dart` (or your endpoint helper) and update the base host address to target your running Backend API server.
-
-4.  Compile and execute the app:
+3.  Compile and execute the app:
     ```bash
     # Run on active device
     flutter run
