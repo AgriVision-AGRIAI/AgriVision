@@ -63,7 +63,7 @@ For modular clarity, each directory contains a specialized `README.md` file:
 
 Ensure you have the following installed:
 *   [Flutter SDK](https://docs.flutter.dev/get-started/install) (Mobile client)
-*   [Node.js](https://nodejs.org/) v18+ & [MongoDB](https://www.mongodb.com/) (API layer)
+*   [Node.js](https://nodejs.org/) v18+ / [TypeScript](https://www.typescriptlang.org/) & [MongoDB](https://www.mongodb.com/) (API layer)
 *   [Python 3.9+](https://www.python.org/) (Inference engine)
 
 ### Step 1: Run the Backend
