@@ -55,11 +55,6 @@ lib/
 ### 1. Multi-Lingual Capability
 To eliminate communication barriers in farming sectors, the application utilizes a tailored localization mechanism. Supported languages (like English, Hindi, and regional dialects) are stored as JSON files under `assets/languages/` and dynamically compiled at runtime via `AppLocalizations`.
 
-### Dynamic Aesthetic Themes
-A custom `ThemeProvider` monitors environment states and adjusts color tones across light and dark displays. 
-*   **Light Theme**: Fresh green palettes expressing organic growth.
-*   **Dark Theme**: Deep ocean green layouts for low-light night conditions in rural landscapes.
-
 ### Crop Pathology Scanner
 Leveraging device cameras, users capture leaf abnormalities. The application transmits binary payloads to the node server which processes diagnostics through computer vision, returning:
 *   Identified disease label
