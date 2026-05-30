@@ -13,7 +13,7 @@ A cross-platform mobile client designed for real-time field utilization by farme
 *   **Framework**: [Flutter SDK](https://flutter.dev/) (Dart)
 *   **State Management**: Provider (MultiProvider architecture)
 *   **Design System**: Custom Material & Cupertino adaptive layouts
-*   **Localization**: custom Multi-lingual asset localization engine
+*   **Localization**: Custom Multi-lingual asset localization engine
 *   **API Client**: HTTP networking with backend services
 
 ---
@@ -24,11 +24,21 @@ A cross-platform mobile client designed for real-time field utilization by farme
 lib/
 ├── main.dart            # Entrypoint, initializing Providers and locales
 ├── pages/               # Feature-based view screens
-│   ├── authentication/  # Sign-up, sign-in, and account registration pages
-│   ├── disease_predict/ # Camera/gallery plant leaf scanner page
-│   ├── general/         # Splash screens, landing dashboard, settings
-│   ├── recommendation/  # Soil detail input forms & crop suggestions
-│   └── weather/         # Temperature & multi-day forecasts layout
+│   ├── authentication/  # Sign-in and OTP verification pages
+│   │   ├── otp-verify.pages.dart
+│   │   └── signin.pages.dart
+│   ├── disease_predict/ # Leaf diagnostics and scanning pages
+│   │   ├── prediction.pages.dart
+│   │   └── scan.pages.dart
+│   ├── general/         # Splash, home dashboard, and profile pages
+│   │   ├── home.pages.dart
+│   │   ├── profile.pages.dart
+│   │   └── splash.pages.dart
+│   ├── recommendation/  # Crop recommendation and fertilizer pages
+│   │   ├── crop.pages.dart
+│   │   └── fertilizer.pages.dart
+│   └── weather/         # Weather dashboards
+│       └── weather.pages.dart
 ├── services/            # API client layers and HTTP endpoints
 ├── themes/              # Custom design themes and dynamic ThemeProviders
 │   ├── light.theme.dart # Light-mode typography & palettes
