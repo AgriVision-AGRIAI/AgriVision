@@ -34,7 +34,6 @@ class LanguageProvider extends ChangeNotifier {
     {'name': 'English', 'locale': const Locale('en', 'US')},
     {'name': 'हिन्दी (Hindi)', 'locale': const Locale('hi', 'IN')},
     {'name': 'తెలుగు (Telugu)', 'locale': const Locale('te', 'IN')},
-    {'name': 'தமிழ் (Tamil)', 'locale': const Locale('ta', 'IN')},
     {'name': 'ਪੰਜਾਬੀ (Punjabi)', 'locale': const Locale('pa', 'IN')},
   ];
 
